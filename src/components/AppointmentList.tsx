@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { useAuth } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -23,6 +24,7 @@ import {
   Grid,
   TextField,
 } from '@mui/material';
+import { VideoCall } from '@mui/icons-material';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -41,6 +43,7 @@ interface AppointmentListProps {
 
 const AppointmentList: React.FC<AppointmentListProps> = ({ doctorId }) => {
   const { getToken } = useAuth();
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -145,6 +148,10 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ doctorId }) => {
     }
   };
 
+  const handleJoinMeeting = (appointmentId: string) => {
+    window.open(`/meeting/${appointmentId}`, '_blank');
+  };
+
   return (
     <Card>
       <CardContent>
@@ -173,16 +180,52 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ doctorId }) => {
                 label="Select Date"
                 value={selectedDate}
                 onChange={handleDateChange}
-                InputLabelProps={{ shrink: true }}
+                InputLabelProps={{ 
+                  shrink: true,
+                  sx: {
+                    color: 'primary.main',
+                  }
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'primary.main',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'primary.main',
+                    },
+                  },
+                  '& input[type="date"]::-webkit-calendar-picker-indicator': {
+                    cursor: 'pointer',
+                    filter: 'invert(0.5)',
+                    '&:hover': {
+                      filter: 'invert(0.7)',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
+                <InputLabel sx={{ color: 'primary.main' }}>Status</InputLabel>
                 <Select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   label="Status"
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main',
+                    },
+                  }}
                 >
                   <MenuItem value="scheduled">Scheduled</MenuItem>
                   <MenuItem value="completed">Completed</MenuItem>
@@ -224,6 +267,16 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ doctorId }) => {
                     <TableCell>
                       {appointment.status === 'scheduled' && (
                         <>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleJoinMeeting(appointment._id)}
+                            startIcon={<VideoCall />}
+                            sx={{ mr: 1 }}
+                          >
+                            Join Meeting
+                          </Button>
                           <Button
                             size="small"
                             onClick={() =>

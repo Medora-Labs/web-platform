@@ -6,6 +6,7 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import theme from './theme';
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
+import MeetingPage from './pages/MeetingPage';
 import PrivateRoute from './components/PrivateRoute';
 
 // Import pages (we'll create these next)
@@ -31,6 +32,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <DashboardPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/meeting/:meetingId"
+                element={
+                  <PrivateRoute>
+                    <MeetingPage />
                   </PrivateRoute>
                 }
               />
